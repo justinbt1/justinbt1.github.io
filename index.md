@@ -7,3 +7,4 @@ Seeking to apply my data science skills for social good, having a positive and m
 
 See my projects on GitHub [here](https://github.com/justinbt1)  
 And my blog posts on Medium [here](https://medium.com/@justinboylantoomey)  
+Finally on Twitter as @jit_compile [here](https://twitter.com/jit_compile)
