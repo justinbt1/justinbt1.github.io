@@ -1,2 +1,1 @@
-# justinbt1.github.io
-Personal Website
+# Personal Website
