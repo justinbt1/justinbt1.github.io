@@ -21,15 +21,14 @@ $$
 
 However, if we break this set into three arbitrary sets $(a, b, c)$ and take the mean of each we get a combined average across all sets of 5.17:
 
-```math
-a = \{1, 2, 3\} = 2 \\
+$$
+a = \{1, 2, 3\} = 2 \newline 
 b = \{4, 5, 6\} = 5 \\
 c = \{7, 8, 9, 10\} = 8.5
-```
+$$
 $$
 (2 + 5 + 8.5) / 3 = 5.17
 $$
-
 
 The discrepancy is due to the combined average not accounting for the number of elements in each set. This discrepancy will become larger as the difference between the set sizes increases.
 
