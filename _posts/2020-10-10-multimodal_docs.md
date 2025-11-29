@@ -390,5 +390,83 @@ The addition of a dense fully connected layer between the final LSTM and softmax
   <br>Figure 2: Early Fusion Model Architecture
 </p>
 
+### Late Fusion Model
+The late fusion method makes use of two separate uni-modal networks and fuses their semantic output representations at decision time. Each uni-modal network performs feature extraction and learns strong modality specific representations for use in document classification, the output of the final layer of each uni-modal network is then fused to give a join classification decision. This approach in theory allows the model to be more robust to missing data from one modality.
 
+There are a number of approaches to late fusion in deep neural classifier networks, in some approaches the uni-modal networks are trained separately, then their free parameters are frozen and the output of their penultimate layers fused together by a dense fully connected output layer. The approach taken for our late fusion model is similar, however the weights and biases in the uni-modal models are not frozen and trained together as part of a multi-modal network.
 
+```python
+def late_fusion_model(vocab_length):
+    # Text CNN
+    text_input = keras.layers.Input(shape=2000)
+    embeddings = keras.layers.Embedding(vocab_length, 150, input_length=2000)(text_input)
+    conv_1d = keras.layers.Conv1D(filters=200, kernel_size=7, activation='relu')(embeddings)
+    global_pooling = keras.layers.GlobalMaxPool1D()(conv_1d)
+    flatten = keras.layers.Flatten()(global_pooling)
+    dense_layer = keras.layers.Dense(
+        50, activation='relu', kernel_regularizer=keras.regularizers.l2(0.5)
+    )(flatten)
+    text_features = keras.layers.Dropout(0.3)(dense_layer)
+
+    # Image CNN LSTM
+    image_input = keras.layers.Input(shape=(10, 200, 200, 1))
+    conv_2d_1 = keras.layers.TimeDistributed(
+        keras.layers.Conv2D(20, 7, activation='relu', padding='same')
+    )(image_input)
+    pool_2d_1 = keras.layers.TimeDistributed(keras.layers.MaxPooling2D(4))(conv_2d_1)
+    conv_2d_2 = keras.layers.TimeDistributed(
+        keras.layers.Conv2D(50, 5, activation='relu', padding='valid')
+    )(pool_2d_1)
+    pool_2d_2 = keras.layers.TimeDistributed(keras.layers.MaxPooling2D(4))(conv_2d_2)
+    extracted_features = keras.layers.TimeDistributed(keras.layers.Flatten())(pool_2d_2)
+    lstm_1 = keras.layers.LSTM(1000, return_sequences=True)(extracted_features)
+    image_features = keras.layers.LSTM(1000, dropout=0.5)(lstm_1)
+
+    # Fused Feed Forward Softmax Classifier
+    concat_features = keras.layers.concatenate([text_features, image_features])
+    output = keras.layers.Dense(6, activation='softmax')(concat_features)
+
+    model = keras.models.Model(inputs=[text_input, image_input], outputs=[output])
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+    return model
+```
+
+The late fusion model was constructed by taking the architectures of the uni-modal 1D text classification CNN and uni-directional C-LSTM page image sequence classification models and replacing their output layers with a single shared six node softmax output layer. Each uni-modal network is otherwise left unchanged, with the same layers, regularisation and other hyperparameters as the original models. The final high level architecture for the late fusion model is shown in Figure 3.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/justinbt1/Multimodal-Document-Classification/refs/heads/main/report/media/late_fusion_model.png" />
+  <br>Figure 3: Late Fusion Model Architecture
+</p>
+
+### Hybrid Fusion Model
+Hybrid fusion networks attempt to combine the benefits of the early and late fusion strategies, with the goal of creating a model that can learn both strong feature and decision level strategies. The hybrid model used in this experiment combines the architectures of the previous early and late fusion models, concatenating the penultimate layers into a single representation connected to a softmax output layer. The final high level architecture for the hybrid fusion model is shown in Figure 4.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/justinbt1/Multimodal-Document-Classification/refs/heads/main/report/media/hybrid_fusion_model.png" />
+  <br>Figure 4: Hybrid Fusion Model Architecture
+</p>
+
+## Evaluation
+### Model Benchmarking
+To assess the average classification performance of the different fusion strategies, each of the fused models were trained and benchmarked against two datasets from the NDR corpus. To measure general performance and allow for benchmarking against the uni-modal text classification model, each multi-modal model was benchmarked against a sub-set of the NDR in which all documents contained both page image and text features, this will from now on be referred to as the Dual Modality Dataset.
+
+Then to measure the robustness of the models in classifying documents that lack any text data, each model was also trained and benchmarked against the entire NDR corpus, we will refer to this as the Complete Dataset. This allows any loss in classifier performance due to a uni-modal image only input to be quantified, as well as allowing the multi-modal models to be benchmarked against the uni-modal image classification CNN model. It's worth noting that robustness to this type of input is is an important performance benchmark as documents that lack text data are common in the NDR corpus and the wider Oil and Gas industry, examples of these document types include microscopy images, seismic profiles and some maps. 
+
+To measure if the performance difference between similarly performing models is statistically significant the Wilcoxon signed-rank test is used to calculate a p-value. This test has been selected as it is more robust to the non-independence of performance values caused by the random resampling approach used to evaluate each model multiple times across the dataset and does not assume homogeneity of variance. This allows us to test the null hypothesis that the difference in performance between to models may be due to random chance, we can reject this hypothesis if the score is below the widely used threshold of 0.05.
+
+### Outcomes and Analysis
+The multi-modal models were benchmarked against the Dual Modality and Complete datasets and the average classification performance metrics obtained are below.
+
+For the Dual Modality Dataset the tuned uni-modal one dimensional CNN text classification model was the strongest performing classifier, this model significantly out performed the multi-modal classifiers when text data was available with an average accuracy 2.1% higher than the best performing multi-modal classifier. This suggests that the semantic and syntactic features extracted from a document’s text content are, when available, perhaps much stronger indicators of a documents classification than visual features such as page layout or image content. This is possibly also in part due to the high inter-class visual similarity of some document page images, such as title pages, all text pages or the identical all zero value padding images added to pad shorter page image sequences during pre-processing.
+
+Out of the multi-modal fusion strategies, the Late Fusion C-LSTM had the highest average accuracy of 84.2%, however this is only 1.7% greater than the average accuracy of the Early Fusion C-LSTM model and not statistically significant with a high p-value of 0.09. This means we must accept the null hypothesis and accept that any performance difference between the two models is likely due to random chance, possibly related to the stochastic nature of initializing and training deep neural networks. The Late Fusion C-LSTM also outperforms the Hybrid Fusion C-LSTM network by a small average accuracy percentage of 1.7%, however a p-value of 0.028 means the null hypothesis is rejected suggesting that the Hybrid Fusion C-LSTM may be marginally less performant.
+
+On the Complete Dataset all of the multi-modal models significantly out- performed the uni-modal CNN (NN) model which had an average accuracy of 72.4% which is 5.8% lower than the most poorly performing and 9.7% lower than the best performing multi-modal models. The performance of the Early and Hybrid Fusion C-LSTM models is nearly identical with an average accuracy difference of 0.1% and a high p-value of 0.86, leading us to accept the null hypothesis that these models are equally performant on this dataset. The Late Fusion C-LSTM model had the highest performance accuracy of 81.1% which is an average performance increase of 3.85%, which when combined with p-value scores of 0.004 when compared with the other multi-modal classifiers allows us to reject the null hypothesis.
+
+The low p-value and robust average accuracy strongly suggest that the Late Fusion CLSTM architecture is the most performant architecture for document classification prediction over the entire NDR Dataset and the most robust to a lack of text modality input. It is interesting to note that there is an increase of 0.6 in the standard deviation of the average accuracy of the Late Fusion CLSTM model when benchmarked against the Complete Dataset, suggesting that the rate of text data sparsity may have some impact on the models performance across the dataset as a whole.
+
+## Final Thoughts
+The best performing architecture was the Late Fusion C-LSTM model architecture which performed well when benchmarked against both traditional uni-modal text and image classifiers. It was also robust to single modality input, significantly outperforming our uni-modal page image classifier. It is hoped that this work provides some useful learnings that can be put towards tackling the problem of retrieving useful data currently locked away in the large unstructured document repositories that typically exist within most major Oil and Gas companies.
+
+With only access to the single Nvidia GeForce RTX 2070 GPU in my home desktop PC, the compute power available to this project was limited and restricted the number of experiments that could be carried out. This project also only explored the multi-modal classification of documents from only 6 of the 65 document classes available in the NDR. I suspect that with an increased compute capacity and additional data will yield much improved multi-modal architectures.
