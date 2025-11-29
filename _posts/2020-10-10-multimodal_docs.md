@@ -34,4 +34,81 @@ Document classifiers that rely on features from only the text modality tend to o
 
 This blog post explores using a multi-modal approach to oil and gas document classification, combining both text and visual modalities to create a more robust classifier for oil and gas exploration and production documents. With the hypothesis that a multi-modal classification approach combining text and visual feature input streams, will outperform a classifier trained on features from a single modality such as text or visual features.
 
+## Data Pre-processing
+The document corpus for this project comes from the UK National Data Repository (NDR), an online repository maintained by the UK Oil and Gas Authority for the storage of petroleum related information and samples. The NDR contains hundreds of thousands of documents, representing 65 document types defined by labels known as CS8 Codes. 
+
+For the purposes of our experiment a document corpus was created by taking a random sample of approximately 1000 documents from each of 6 key document classes present in the NDR, with each document's provided CS8 Code being used as a classification label. The document classes selected for inclusion in this dataset were; geological end of well reports (geol_geow), geological sedimentary reports (geol_sed), general geophysical reports (gphys_gen), well log summaries (log_sum), pre-site reports (pre_site) and vertical seismic profile files (vsp_file).
+
+### Feature Extraction
+As this is a new dataset, the text and page image features needed to be extracted from each document in the NDR corpus, for use as training, validation and test data for evaluating each of the classification models. The raw documents were downloaded manually via the free to access NDR website where they are available under an open data license and processed using a feature extraction pipeline.
+
+Unfortunately features were not successfully extracted from all documents, some older Microsoft Office documents could not be processed, while others were corrupt or had non-standard file formats. Several documents also did not contain any text content and therefore lack a text feature set.
+
+### Text Pre-Processing
+The text feature dataset consists of a vector of integers T for each document representing the first 2,000 informative terms following text extraction and pre-processing. To create each vector, each document's text first had to be extracted. Text extraction from ascii format files was achieved using native Python. For Microsoft Office files and PDF files with an embedded searchable text layer text was extracted using Apache Tika Server. For scanned PDF files without an embedded text layer and image format files, text was extracted using the Tesseract OCR Engine.
+
+```python
+def start_tika_server(tika_path):
+    command = f'java -cp "{tika_path}" org.apache.tika.server.TikaServerCli ' \
+    '--port 80 --host 127.0.0.1'
+    tika_server = subprocess.Popen(
+        command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
+
+    try:
+        requests.get('http://127.0.0.1:80/tika')
+    except requests.exceptions.ConnectionError as e:
+        raise SystemExit(f'Unable to connect to Tika Server. {e}')
+
+    return tika_server
+  
+def extract_text(file):
+    tika_response = requests.put(
+        url=f'http://127.0.0.1:80/tika',
+        data=file,
+        headers={
+            'X-Tika-PDFOcrStrategy': 'no_ocr',
+            'X-Tika-OCRLanguage': 'eng',
+            'X-Tika-OCRTimeout': '1500',
+            'Accept': 'text/plain'
+        },
+        timeout=1500
+    )
+
+    tika_response = {
+        'content': tika_response.text,
+        'status': tika_response.status_code
+    }
+
+    return tika_response
+```
+
+The raw text extracted from each document was case folded to lower case and tokenized using the pre-trained Word Punkt tokenizer available in the NLTK library, into a sequence of individual tokens. Any tokens with low semantic value were then dropped from the sequence, including non-word tokens such as numbers and punctuation, as well as frequently occurring stopwords. Each token was then lemmatized to it's base form using the Word Net lemmatizer in NLTK, this reduces dimensionality while preserving the semantic meaning of each token term.
+
+```python
+def text_processing(text):
+    lemmatizer = nltk.stem.WordNetLemmatizer()
+    text = text.casefold()
+    text = text.translate(text.maketrans({'\'': None, '-': ' '}))
+    text = nltk.word_tokenize(text)
+    clean_tokens = []
+
+    for token in text:
+        if token in nltk.corpus.stopwords.words('english'):
+            continue
+        if not token.isalpha():
+            continue
+        if len(token) < 2:
+            continue
+
+        token = lemmatizer.lemmatize(token)
+        clean_tokens.append(token)
+
+    clean_string = ' '.join(clean_tokens)
+
+    return clean_string
+```
+
+The processed tokens were then converted to integers, this was achieved by creating a vocabulary set V containing all unique tokens extracted from each document and mapping each to a unique integer value v. The first 2,000 processed tokens for each document are then mapped to their corresponding v integer value in V to create a vector of integers T for each document. Any vectors with less than 2,000 integers are padded with 0 so that |T| = 2,000 giving a consistent input size for our models.
+
 
