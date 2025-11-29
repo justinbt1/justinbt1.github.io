@@ -3,8 +3,8 @@ title: 'Neo4j Super Node Performance Issues'
 date: 2024-02-26
 permalink: /posts/neo4j-super-node-performance-issues
 tags:
-  - data science
-  - statistics
+  - databases
+  - network analysis
 ---
 We recently developed a multi-billion relationship scale knowledge graph, representing the wider academic landscape. How we developed the data pipeline to build this graph in Neo4j is a story in itself, one I may write up here or on the [Wellcome Data blog](https://medium.com/wellcome-data). This post however focuses on a specific database modelling issue that has caused us severe query performance issues, the issue of low cardinality "super nodes".
 
@@ -64,4 +64,57 @@ MATCH(p:Publication)-[l:LINKED {year:2020}]->(p:FieldOfResearch)
 
 This moderately improves performance of some queries where the use of this property is an appropriate filter. However in our data model there are no properties that could reasonably be used as filters, and these relationships are often queried in bulk reducing any performance advantage. 
 
+### Refactoring Super Nodes to Node Properties
+Another option, that swaps our unreasonable execution time for a more reasonable increase in spatial complexity, is to refactor the super nodes in our data model to properties on their related nodes. This is especially appealing given the super nodes in our model are categorical, with single type, unidirectional relationships.
 
+For example a relationship between a publication and a field of research super node, could be set instead as a property on the Publication node. These properties could then be indexed to further improve query performance, and the redundant super nodes and their many relationships could then (carefully) be removed from the graph. 
+
+Refactoring super nodes to properties did improve the performance of our queries, particularly those that include, but do not filter on the new super node property. There was a wrinkle though, the incoming relationships on the super nodes were one to many relationships, meaning the new super node properties have multiple values.
+
+For example a publication node could be linked to multiple field of research nodes:
+
+The properties of these field of research nodes now need to be set as properties on the publication node. Initially we used a list property to store these values, with a single list property for each of these values. This however is still not optimal as Neo4j does not currently support indexing on the elements within lists, making these slow to query at scale.
+
+### Full Text Indexes to The Rescue
+Neo4j does however support full text indexes for string properties and make them fully searchable using the Apache Lucene search and indexing library. Neo4j also allows the specification of the analyzer Lucene should use to tokenise the text for index and querying. One of the available analyzers is "whitespace" which breaks text into individual searchable word tokens based on the Java whitespace standard.
+
+By converting our list elements to a single string type property, we were able to leverage the full text index to drastically improve query times when filtering by any of the list elements. To convert the lists to a string, we first replaced the white space in each element with an _ then merged the elements into a single long space separated lower case string.
+
+For example the field of research list property:
+
+```python
+field_of_research:[
+  "Civil Engineering",
+  "Geology",
+  "Earth Sciences",
+  "Engineering"
+]
+```
+Was converted to the string property:
+```python
+field_of_research:"civil_engineering geology earth_sciences engineering"
+```
+These new string properties were then indexed with the full text index configured to use the whitespace analyzer, using the below Cypher procedure:
+```cypher
+CREATE FULLTEXT INDEX field_of_research_fultext
+FOR (p:Publication)
+ON EACH [p.field_of_research]
+OPTIONS {
+  indexConfig: {
+    `fulltext.analyzer`: 'whitespace'
+  }
+}
+```
+Making it possible to use full text search to efficiently filter by the element in each string property.
+
+```cypher
+CALL db.index.fulltext.queryNodes(
+  "field_of_research_fultext",
+  "earth_sciences"
+)
+YIELD node
+MATCH (node)<-[]-(r:Researcher)
+RETURN node, r
+```
+### Performance Improvement
+Migrating field of research from it's own Field of Research node type to a full-text indexed property on each publication node has drastically improved query times. With queries seeking to find all publication nodes in a given year, linked to specific fields of research have gone from taking nearly a day to execute to a few seconds.
