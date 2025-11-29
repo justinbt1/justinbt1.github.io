@@ -22,19 +22,19 @@ $$
 However, if we break this set into three arbitrary sets $(a, b, c)$ and take the mean of each we get a combined average across all sets of 5.17:
 
 $$
-a = \{1, 2, 3\} = 2
+a = \{1, 2, 3\}
 $$  
 
 $$
-b = \{4, 5, 6\} = 5
+b = \{4, 5, 6\}
 $$  
 
 $$
-c = \{7, 8, 9, 10\} = 8.5
+c = \{7, 8, 9, 10\}
 $$  
 
 $$
-(2 + 5 + 8.5) / 3 = 5.17
+(\bar{a} + \bar{b} + \bar{c}) / 3 = 5.17
 $$
 
 The discrepancy is due to the combined average not accounting for the number of elements in each set. This discrepancy will become larger as the difference between the set sizes increases.
@@ -48,10 +48,17 @@ The discrepancy is due to the combined average not accounting for the number of 
 We can apply the above process to our sets (a, b, c) to calculate the weighted averages, which when summed these give the true overall average of 5.5.
 
 $$
-a = \{1, 2, 3\} = 2 x (3 / 10) = 0.6\\
-b = \{4, 5, 6\} = 5 x (3 / 10) = 1.5\\
-c = \{7, 8, 9, 1\} = 8.5 x (4 / 10) = 3.4
+a = \{1, 2, 3\} = 2 x (3 / 10) = 0.6
+$$  
+
 $$
+b = \{4, 5, 6\} = 5 x (3 / 10) = 1.5
+$$  
+
+$$
+c = \{7, 8, 9, 1\} = 8.5 x (4 / 10) = 3.4
+$$  
+
 $$
 0.6 + 1.5 + 3.4 = 5.5
 $$
