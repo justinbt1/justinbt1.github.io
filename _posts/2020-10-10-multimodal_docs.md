@@ -169,6 +169,159 @@ The stochastic nature of training a deep learning model also needs to be account
 
 To measure how well the model generalises across the entire NDR dataset instead of simply optimising the model to predict a specific test sample, it is necessary to also vary the sub-samples used in training, validating and testing the model. Therefore a different random sample split is used for each iteration and to ensure the same sub-samples are used for each model a random seed is used in sequence to calculate each iterations split values. 
 
+## Baseline Models
+### Text Classification Model
+The text classification model used in this project is based on the simple 1D CNN model for text classification architecture. The original model had a simple architecture with just a single convolutional layer, followed by a global max pooling layer and a fully connected softmax output layer. To avoid overfitting or co-adaptation of hidden units, dropout is employed in the penultimate network layer, reportedly improving the performance by up to 4%. An l2 norm constraint is also applied to help further regularise the model.
+
+The original model made use of pre-trained Word2Vec word embeddings trained on a 100 billion word Google News corpus using the continuous bag of words (CBOW) method as inputs. These dense embeddings attempt to capture the semantic and syntactic meaning of each word in the training corpus and have been shown to perform better than sparse representations such as TF-IDF or one hot encoding in text classification tasks.
+
+Unfortunately generic pre-trained neural language models struggle to capture domain specific semantics and vocabulary, resulting in a large number of out of vocabulary terms. Therefore the generic Word2Vec model does not perform well for the classification of corpora with highly domain specific vocabularies, such as in the oil and gas industry specific NDR corpus. With this in mind the text classification model makes use of bespoke dense embeddings, learned during training through the use of a TensorFlow Keras embedding layer. The embedding layer is initialized with random weights, which are then updated during training to learn dense word embeddings, each with a vector length of 150 values. This approach has the advantage of learning embeddings specific to the classification task and corpus texts.
+
+Despite having a relatively simple architecture, originally proposed for the classification of shorter sentences, this model has been shown to be very effective against well know document classification benchmark datasets. However hyperparameter tunning of the original model is required to maximise classification performance.
+
+As a baseline the model was initially fitted and tested using the original architecture and hyperparameters as shown below. When trained with the original hyperparameters the model converged after an average of 23 epochs, the trained model had an average accuracy of 82.6%, average recall score of 0.83, average precision score of 0.83 and an average macro f1 score of 0.83 when evaluated against the test dataset.
+
+The model was then optimised for the task of classifying documents in the NDR corpus through hyperparameter tuning. A coarse grid search was performed on each of the following hyperparameters to find it's optimal values relating to the models classification performance; the kernel size of each feature region and the number of feature maps in the convolutional layer, the dropout rate and the l2 norm constraint threshold.
+
+```python
+def text_cnn_model(
+        doc_data, embedding_size=150, filter_maps=100, kernel_size=4,
+        dropout_rate=0.5, l2_regularization=3, dense_nodes=100, dense_layers=0,
+        optimizer='adam', loss='categorical_crossentropy'
+):
+    input_layer = keras.layers.Input(shape=2000)
+
+    embeddings = keras.layers.Embedding(
+        doc_data.vocab_length,
+        embedding_size,
+        input_length=2000
+    )(input_layer)
+   
+    conv_1d = keras.layers.Conv1D(
+        filters=filter_maps, kernel_size=kernel_size, activation='relu'
+    )(embeddings)
+        
+    global_pooling = keras.layers.GlobalMaxPool1D()(conv_1d)
+    extracted_features = keras.layers.Flatten()(global_pooling)
+
+    if dense_layers > 0:
+        dense_layer = keras.layers.Dense(dense_nodes, activation='relu')(extracted_features)
+        for layer in range(dense_layers - 1):
+            dense_layer = keras.layers.Dense(dense_nodes, activation='relu')(dense_layer)
+        dropout_layer = keras.layers.Dropout(dropout_rate)(dense_layer)
+    else:
+        dropout_layer = keras.layers.Dropout(dropout_rate)(extracted_features)
+
+    regularise = keras.regularizers.l2(l2_regularization)
+
+    output = keras.layers.Dense(
+        6, activation='softmax', kernel_regularizer=regularise
+    )(dropout_layer)
+
+    model = keras.models.Model(inputs=[input_layer], outputs=[output])
+    model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+
+    return model
+```
+I also experimented with adding dense feed forward layers prior to the dropout and softmax output layers, finding that the addition of a single fully connected feed forward layer improved model performance while reducing the number of epochs taken for the model to converge. A coarse grid search was conducted using different numbers of nodes in the dense fully connected layer, finding 50 nodes to be optimal. Varying the number of convolutional layers in the model was also tested, as deeper architectures have been shown to be highly effective at text classification tasks. However in this case adding additional convolutional layers had a high computational cost and did not significantly improve model performance.
+
+Once trained the tunned model yielded an average test accuracy of 86.3% for classifying documents containing text data, an improvement of 3.7% compared to the original model. The model also had an improved average macro F1 score of 0.86.
+
+### Page Image Classification Model
+Two dimensional CNNs have revolutionised deep learning performance in the area of image classification, including the classification of document page images. Most prior work in document classification has focused on the use of CNNs to classify documents one page at a time as a continuous document stream of discrete page images. We attempt to replicate previous work in this area by first evaluating a single page CNN classifier on only the first page, then expanding this approach to multi-page document classification.
+
+We then build on this work, evaluating a combined C-LSTM (Convolutional Long Short Term Memory) architecture that takes the original CNN network and places it within an LSTM network architecture to classify documents based on page image sequences. LSTM networks are a form of recurrent neural network capable of learning temporal relationships between the page images such as page order and proximity. This means they may perform better on the NDR document classification task, factoring the composition and order of multiple pages into a documents classification.
+
+The single page CNN model architecture was adapted from previous work on page image classification, in which greyscale document page images similar to those in the NDR dataset were classified with an overall accuracy of 65.35%. The models architecture consists of two convolutional layers, and two max pooling layers, the output of which is fed into a two layer dense feed forward network with 1000 nodes in each layer, followed by a final softmax output layer. The first convolutional layer has 20 feature maps and kernel size of 7 x 7, the second convolutional layer has 50 feature maps and a kernel size of 5 x 5, both max pooling layers have 4 x 4 pooling kernels. The network is regulated by applying dropout at the penultimate layer at a rate of 0.5, this masks out the output activations from 50% of the neurons in the final dense layer. The model was tested with different dropout rates with the optimal dropout rate being 0.5 as per the original paper. The addition of zero padding on the output of the initial convolutional layer also improved model performance.
+
+```python
+def image_cnn_model(
+        filter_map_1=20, kernel_size_1=7, filter_map_2=50, kernel_size_2=5,
+        pooling_kernel=4, dropout_rate=0.5, dense_nodes=1000, optimizer='adam',
+        loss='categorical_crossentropy'
+):
+    image_input = keras.layers.Input(shape=(200, 200, 1))
+    conv_2d_1 = keras.layers.Conv2D(
+        filter_map_1, kernel_size_1, activation='relu', padding='same'
+    )(image_input)
+    pool_2d_1 = keras.layers.MaxPooling2D(pooling_kernel)(conv_2d_1)
+    conv_2d_2 = keras.layers.Conv2D(
+        filter_map_2, kernel_size_2, activation='relu', padding='valid'
+    )(pool_2d_1)
+    pool_2d_2 = keras.layers.MaxPooling2D(pooling_kernel)(conv_2d_2)
+    extracted_feature = keras.layers.Flatten()(pool_2d_2)
+    dense_1 = keras.layers.Dense(dense_nodes, activation='relu')(extracted_feature)
+    dense_2 = keras.layers.Dense(dense_nodes, activation='relu')(dense_1)
+    dropout_layer = keras.layers.Dropout(dropout_rate)(dense_2)
+    output = keras.layers.Dense(6, activation='softmax')(dropout_layer)
+
+    model = keras.models.Model(inputs=[image_input], outputs=[output])
+    model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+
+    return model
+```
+
+We then expanded the use of the single page CNN architecture to multi-page document classification. First an ensemble approach was tested with the majority vote being taken as a documents class, with the strength of the softmax probability prediction being used to resolve any conflicts. First the single page CNN model was trained on all ten pages from every document. The model was able to classify individual pages with an accuracy of 49% and F1 score of 0.48. During model evaluation, inference was performed on all pages in a document using the majority vote method to give a final prediction for the document as a whole. Unfortunately this approach performed poorly with an accuracy of 50%, which may be in part due to the model trying to classify zero padding images in the input sequence.
+
+Following the poor performance of the majority vote approach the use of a simple neural network classifier was investigated to combine the output probabilities for each page into a single document classification. The theory behind trying this approach was that even a simple neural network should be able to learn to place less value on zero value padding images and similar pages across classes, while recognising meaningful class specific pages or probability combinations. The CNN output probabilities for each page were concatenated into a single feature vector and used as input to a simple three layer neural network classifier. The classifier architecture consisted of a 60 node input layer, a hidden 10 node fully connected layer and a 6 node softmax output layer, with the number of nodes in the hidden layer being determined by a grid search. When evaluated this approach gave a classification accuracy score of 72.4% a major improvement of 22.4% compared to the majority vote method and a significant accuracy improvement of 5.3% over the Single Page CNN.
+
+The use of a C-LSTM model architecture was then investigated, with the aim of unifying multi-page classification into a single model that can learn important temporal relationships within document page sequences. The C-LSTM model uses the same CNN architecture as the single page model as time distributed feature extractors. The output sequence from the temporal CNN feature extraction layers is then fed into two uni-directional LSTM layers in place of the previous dense layers used in the Single Page CNN. The output of the final CNN layer is regulated using dropout prior to the final softmax output layer.
+
+```python
+def image_cnn_lstm_model(
+    filter_map_1=20, kernel_size_1=7, filter_map_2=50, kernel_size_2=5,
+    pooling_kernel=4, dropout_rate=0.5, lstm_nodes=1000, optimizer='adam',
+    loss='categorical_crossentropy', bi_directional=False,
+):
+    image_input = keras.layers.Input(shape=(10, 200, 200, 1))
+
+    conv_2d_1 = keras.layers.TimeDistributed(
+        keras.layers.Conv2D(
+            filter_map_1, kernel_size_1, activation='relu', padding='same'
+        )
+    )(image_input)
+
+    pool_2d_1 = keras.layers.TimeDistributed(
+        keras.layers.MaxPooling2D(pooling_kernel)
+    )(conv_2d_1)
+
+    conv_2d_2 = keras.layers.TimeDistributed(
+        keras.layers.Conv2D(
+            filter_map_2, kernel_size_2, activation='relu', padding='valid'
+        )
+    )(pool_2d_1)
+
+    pool_2d_2 = keras.layers.TimeDistributed(
+        keras.layers.MaxPooling2D(pooling_kernel)
+    )(conv_2d_2)
+
+    extracted_features = keras.layers.TimeDistributed(
+        keras.layers.Flatten()
+    )(pool_2d_2)
+
+    if bi_directional:
+        lstm_1 = keras.layers.Bidirectional(
+            keras.layers.LSTM(lstm_nodes, return_sequences=True)
+        )(extracted_features)
+
+        lstm_2 = keras.layers.Bidirectional(
+            keras.layers.LSTM(lstm_nodes, dropout=dropout_rate)
+        )(lstm_1)
+    else:
+        lstm_1 = keras.layers.LSTM(lstm_nodes, return_sequences=True)(extracted_features)
+        lstm_2 = keras.layers.LSTM(lstm_nodes, dropout=dropout_rate)(lstm_1)
+
+    output = keras.layers.Dense(6, activation='softmax')(lstm_2)
+
+    model = keras.models.Model(inputs=[image_input], outputs=[output])
+    model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+
+    return model
+```
+
+The C-LSTM model performed significantly better than the Single Page CNN, showing an improvement of 6.5% average accuracy. How ever it performed worse than the Multi-Page CNN with the additional neural network ensemble layer, which had a 1.1% higher accuracy. However this is only a marginal gain with the simpler single model architecture and faster inference making the C-LSTM a more practical choice. The use of bi-directional LSTM layers in place of the uni-directional LSTM layers was also evaluated but did not improve the average performance of the model. An overview of average performance metrics for each page image classification model has been provided in Table 4.
+
+
 
 
 
