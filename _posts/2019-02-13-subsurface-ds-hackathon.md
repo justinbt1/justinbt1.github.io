@@ -29,6 +29,11 @@ I was on the team working on predicting facies using well log data, however we d
 
 We then used a Random Forest algorithm to identify the most important features, these were then used to train a Random Forest containing 100 separate Decision Trees. Then using leave-one-oil-well-out cross validation, we were able to predict the facies of a blind well with a 94% accuracy average.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/justinbt1/Mystic-Bit/refs/heads/master/images/facies_qc_curves.jpg" />
+  <br>Facies prediction from synthetic wireline logs.
+</p>
+
 Though we ran out of time to combine this with real time syn-drilling prediction this is a good proof of concept to show how it would work in practice. We also tried combining the geology from surrounding wells in the model, however due to extensive faulting in the area this actually made our predictions marginally worse instead of better!
 
 ## We won best executed project!
