@@ -321,8 +321,74 @@ def image_cnn_lstm_model(
 
 The C-LSTM model performed significantly better than the Single Page CNN, showing an improvement of 6.5% average accuracy. How ever it performed worse than the Multi-Page CNN with the additional neural network ensemble layer, which had a 1.1% higher accuracy. However this is only a marginal gain with the simpler single model architecture and faster inference making the C-LSTM a more practical choice. The use of bi-directional LSTM layers in place of the uni-directional LSTM layers was also evaluated but did not improve the average performance of the model. An overview of average performance metrics for each page image classification model has been provided in Table 4.
 
+## Multi-Modal Models
+### Early Fusion Model
+Early fusion in multi-modal deep learning involves the early concatenation of uni-modal features, usually immediately after feature extraction into a single joint representation. In deep neural network classifiers this single joint representation is then used as input to the models decision layers. The early combination of modalities prior to classification, allows the model to learn important inter-modal features and low level correlations across both modalities. This approach is loosely analogous to how biological neural networks perform multisensory convergence early on in their sensory processing pathways. However an early fusion model is less likely to learn strong modality specific features than models using late or hybrid fusion, which may hamper classification performance when one of the text or image modalities is missing.
 
+The architecture of the early fusion neural network used for this experiment is a C-LSTM that concatenates the page image and text features post extraction to provide a joint representation. Feature extraction for each modality is initially performed separately, using an identical approach to feature extraction as that used in the previously evaluated uni-modal networks. A one-dimensional CNN, with word embeddings and a global max-pooling layer is used to extract features from the input text. A dual layer two-dimensional CNN is used to extract features from the input page images, consisting of alternating convolutional and max pooling layers. The extracted features from both are then flattened and concatenated into a joint feature representation, this is then fed into two LSTM cell layers followed by a single softmax layer that provides the classification prediction probabilities.
 
+As in the uni-modal page image classification C-LSTM model a recurrent LSTM architecture is used to allow the model to learn important temporal relationships between the page images, however the LSTM cell layers require inputs to be a time distributed sequence. The image inputs already exist in an ordered sequence of ten pages and distributing them as inputs is trivial, however there is only a single instance of text input data per document. Therefore to create a joint feature representation that can be processed by the LSTM, the text data is replicated ten times to create a sequence of ten identical texts. This allows features from each page image to be concatenated with those from the documents extracted text and processed by the LSTM as a single temporally distributed joint sequence.
+
+Due to the time and space complexity of the model as well as the large number of tuneable parameters, it was unfeasible to use grid-search or even Bayesian hyperparameter optimisation methods on all layers and parameters of the network. Therefore hyperparameter tunning was only carried out on the final LSTM and regularisation layers, making the assumption that the feature extraction layers have already been optimised for feature extraction on the input data during the tunning of the uni-modal models.
+
+```python
+def early_fusion_model(vocab_length):
+    text_input = keras.layers.Input(shape=(10, 2000), name='text_input')
+    embeddings = keras.layers.TimeDistributed(
+        keras.layers.Embedding(vocab_length, 150, input_length=2000),
+        name='word_embeddings'
+    )(text_input)
+    conv_1d = keras.layers.TimeDistributed(
+        keras.layers.Conv1D(filters=200, kernel_size=7, activation='relu'),
+        name='1d_convolutional_layer'
+    )(embeddings)
+    global_pooling = keras.layers.TimeDistributed(
+        keras.layers.GlobalMaxPool1D(), name='max_pooling_layer'
+    )(conv_1d)
+    image_features = keras.layers.TimeDistributed(
+        keras.layers.Flatten(), name='text_features'
+    )(global_pooling)
+
+    image_input = keras.layers.Input(shape=(10, 200, 200, 1), name='image_input')
+    conv_2d_1 = keras.layers.TimeDistributed(
+        keras.layers.Conv2D(20, 7, activation='relu', padding='same'),
+        name='2d_convolutional_layer_1'
+    )(image_input)
+    pool_2d_1 = keras.layers.TimeDistributed(
+        keras.layers.MaxPooling2D(4), name='2d_max_pooling_layer_1'
+    )(conv_2d_1)
+    conv_2d_2 = keras.layers.TimeDistributed(
+        keras.layers.Conv2D(50, 5, activation='relu', padding='valid'),
+        name='2d_convolutional_layer_2'
+    )(pool_2d_1)
+    pool_2d_2 = keras.layers.TimeDistributed(
+        keras.layers.MaxPooling2D(4), name='2d_max_pooling_layer_2'
+    )(conv_2d_2)
+    text_features = keras.layers.TimeDistributed(
+        keras.layers.Flatten(), name='image_features'
+    )(pool_2d_2)
+
+    joint_features = keras.layers.concatenate([text_features, image_features])
+
+    lstm_1 = keras.layers.LSTM(450, return_sequences=True)(joint_features)
+    lstm_2 = keras.layers.LSTM(1000)(lstm_1)
+    dropout = keras.layers.Dropout(0.5)(lstm_2)
+    output = keras.layers.Dense(6, activation='softmax')(dropout)
+
+    model = keras.models.Model(inputs=[text_input, image_input], outputs=[output])
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+    return model
+```
+
+A coarse grid search was performed on a per feature basis, exploring the number of nodes in each LSTM layer and the dropout rate applied to regulate the model at the penultimate layer. This process identified 1000 nodes and a dropout rate of 0.5 was optimal for the final LSTM layer, interestingly creating a bottleneck by using only 450 nodes in the first LSTM layer led to a reasonable increase in classification performance.
+
+The addition of a dense fully connected layer between the final LSTM and softmax output layer was also tested with varying numbers of nodes, however this layers addition was found to degrade the models performance. The final high level architecture for the early fusion model is shown in Figure 2.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/justinbt1/Multimodal-Document-Classification/refs/heads/main/report/media/early_fusion_model.png" />
+  <br>Figure 2: Early Fusion Model Architecture
+</p>
 
 
 
