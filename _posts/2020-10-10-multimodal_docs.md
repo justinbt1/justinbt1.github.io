@@ -111,4 +111,65 @@ def text_processing(text):
 
 The processed tokens were then converted to integers, this was achieved by creating a vocabulary set V containing all unique tokens extracted from each document and mapping each to a unique integer value v. The first 2,000 processed tokens for each document are then mapped to their corresponding v integer value in V to create a vector of integers T for each document. Any vectors with less than 2,000 integers are padded with 0 so that \|T\| = 2,000 giving a consistent input size for our models.
 
+### Image Pre-Processing
+The visual feature dataset consists of sequences of JPEG images, with each sequence S containing image representations of the first ten pages of each document in the corpus. For documents in a non-image file format the pages were converted to image representations.
+
+For PDF format documents each page was converted to a single JPEG image using the Poppler PDF rendering library.
+
+```python
+from pdf2image import convert_from_bytes
+
+with open(file_properties.file_path, 'rb') as pdf_file:
+  pdf_bytes = pdf_file.read()
+ 
+page_images = convert_from_bytes(pdf_bytes, dpi=300, size=(500, 500))
+```
+
+For raw text format files a new blank image with all white pixels was created using a standard A4 page size of 1748 x 2480 pixels and the documents text content was fitted to and overlayed on each blank page image. For documents with less than ten pages, each sequence was then padded with blank 2D arrays with all pixel values in each array set to zero.
+
+```python
+from PIL import Image, ImageDraw, ImageFont
+
+font = ImageFont.truetype("arial.ttf", 16, encoding="unic")
+
+
+def page_image(page_text, file_path):
+    image = Image.new('L', (1748, 2480), color=255)
+    draw = ImageDraw.Draw(image)
+    draw.text((20, 20), page_text, font=font)
+    image = image.resize((500, 500))
+    image = image.convert('RGB')
+    image.save(file_path, 'JPEG', quality=100)
+```
+Each extracted page image was then resized to 200 x 200 pixels using cubic interpolation to make them small enough to be fed into a classification convolutional neural network (CNN). This image size was selected as a compromise between the loss of information in the image verses the computational cost of a larger image size, as well as a desire for a consistent input size for the models. Larger input sizes may also lead to overfitting as the CNN may learn more granular features such as characters or image details that are only relevant to specific documents in the training dataset, instead of the overall general layout of documents within each class.
+
+Certain documents within the corpus have pages with very large aspect ratios, documents in the comp_log class for example often have a vertical aspect ratio of c. 12.0 compared to the aspect ratio of 1.414 of a typical A4 document page. Resizing these images to 200 x 200 pixels causes significant loss of layout and image information. Therefore, page images with an aspect ratio greater than 2.0 were treated as though they covered multiple pages and split into multiple consecutive images, each with an aspect ratio of 1.414 prior to being resized, with each image being treated as a separate page in the document.
+
+To further reduce unnecessary complexity the page images were converted to single channel greyscale format using Floyd-Steinberg dither to approximate the original image luminosity levels, the original RGB format images were also tested but when benchmarked with the uni-modal image classification model the accuracy gains were not significant and had a significant computational cost. As a final pre-processing step the pixel values in each page image were normalised by dividing each pixel value by the maximum pixel intensity value of 255.
+
+## Experiment Design
+### Experiment Goals
+The experimental goal is to investigate the effectiveness of multi-modal deep learning at the task of classifying the multi-page documents within the NDR corpus.
+
+First in order to provide a benchmark against which to measure the performance of the multi-modal models two uni-modal models will be evaluated, a text based classifier and a classifier built using page images.
+
+Various multi-modal approaches that combine both document text and page images will then be explored using early, late and combined fusion architectures.
+
+### Model Hyperparameters
+The majority of hyperparameters will be specific to each model architecture used in this work, however a number of hyperparameters are fixed for all models. This makes comparing the performance of the models easier and allows the combination of uni-modal model architectures into the more complex multi-modal models. Model specific parameters are adapted from previous work or determined experimentally and tuned using a grid search optimisation approach.
+
+For the fixed hyperparameters the ReLU activation function is used for all hidden network layers, with a softmax activation function being used for all output layers. Every model also uses the Adam optimization algorithm to optimize a categorical cross entropy loss function, with the default TensorFlow learning rate of 0.001 providing a good balance of classification accuracy and performance when tested experimentally with various rates on both uni-modal models.
+
+### Model Training
+The dataset used for training and evaluating each model will be split with 80% being used for training and 20% being used for testing model performance, with 10% of the training dataset being set aside for use in validation during model training. The dataset is split randomly and in a stratified manner to ensure an even split across all classes, a random seed is used to ensure reproducibility.
+
+To avoid overfitting the models due to over-training the training process is terminated using an early stopping technique. At the end of each training epoch the model's performance is measured against the validation set and if the validation loss has not decreased for two consecutive epochs, training is halted. The model weights are then reverted to the state with the lowest validation loss to produce the final trained model. Once training is complete each model will be evaluated using the same performance metrics; overall percentage accuracy, macro precision and recall scores, macro F1 score and the number of epochs each model takes to converge.
+
+The stochastic nature of training a deep learning model also needs to be accounted for in the model evaluation process. A model with a set architecture can vary in performance due to a number of factors, including random weight and bias initialization values or the stochastic behaviour of the Adam optimisation algorithm as it traverses the error gradient. To compensate for the effect of model variance on the evaluation of model performance, each model is initialized and evaluated ten times with the average performance metrics of all ten initializations being taken as the models overall performance.
+
+To measure how well the model generalises across the entire NDR dataset instead of simply optimising the model to predict a specific test sample, it is necessary to also vary the sub-samples used in training, validating and testing the model. Therefore a different random sample split is used for each iteration and to ensure the same sub-samples are used for each model a random seed is used in sequence to calculate each iterations split values. 
+
+
+
+
 
