@@ -13,22 +13,23 @@ The short answer to this question is no, the longer answer is it depends. The av
 - The cardinality (number of elements) of each averaged set are the same.
 - The trivial and rare case where all set averages equal to zero.
 
-Let's have a look at why, the mean of the values in the below set is $`5.5`$:
+Let's have a look at why, the mean of the values in the below set is 5.5:
 
 $$
 a = \{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 \}
 $$
 
-However, if we break this set into three arbitrary sets $(a, b, c)$ and take the mean of each we get a combined average across all sets of $5.17$:
+However, if we break this set into three arbitrary sets $(a, b, c)$ and take the mean of each we get a combined average across all sets of 5.17:
 
-$$
+```math
 a = \{1, 2, 3\} = 2 \\
 b = \{4, 5, 6\} = 5 \\
 c = \{7, 8, 9, 10\} = 8.5
-$$
+```
 $$
 (2 + 5 + 8.5) / 3 = 5.17
 $$
+
 
 The discrepancy is due to the combined average not accounting for the number of elements in each set. This discrepancy will become larger as the difference between the set sizes increases.
 
