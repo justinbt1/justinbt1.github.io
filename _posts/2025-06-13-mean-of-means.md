@@ -24,12 +24,15 @@ However, if we break this set into three arbitrary sets $(a, b, c)$ and take the
 $$
 a = \{1, 2, 3\} = 2
 $$  
+
 $$
 b = \{4, 5, 6\} = 5
 $$  
+
 $$
 c = \{7, 8, 9, 10\} = 8.5
 $$  
+
 $$
 (2 + 5 + 8.5) / 3 = 5.17
 $$
