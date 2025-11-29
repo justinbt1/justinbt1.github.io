@@ -39,3 +39,29 @@ RETURN r
 
 This query would take an extremely long time to execute as several million unindexed relationships between publications and the clinical science FoR node need to be checked during query execution.
 
+## Improving Perfomance
+### Query Refactoring
+The simplest way we can improve performance is to refactor our queries to make them more efficient. One of the simplest ways to do this is to ensure both the relationship type and directionality are defined in the Cypher query.
+
+```cypher
+//Non-directional and undefined
+MATCH(p:Publication)-[]-(p:FieldOfResearch)
+
+//Directional and defined
+MATCH(p:Publication)-[l:LINKED]->(p:FieldOfResearch)
+```
+
+Unfortunately this does not help in our use case as all of the super nodes in our model have mono-directional, single type relationships with their related nodes. 
+
+### Indexing Relationships
+Neo4j does index relationships by default using a token lookup index that only contains type information for each index rather than information on which nodes they connect. However since version 4.3, Neo4j also supports indexing on relationship properties, this can be used to reduce the number of relationships that have to be checked during query execution.
+
+For example the relationship between a Field of Research and a Publication node might have a publication_year property,  which could be used as a filter to reduce the number of relationships required in a query by filtering to a specific year:
+
+```cypher
+MATCH(p:Publication)-[l:LINKED {year:2020}]->(p:FieldOfResearch)
+```
+
+This moderately improves performance of some queries where the use of this property is an appropriate filter. However in our data model there are no properties that could reasonably be used as filters, and these relationships are often queried in bulk reducing any performance advantage. 
+
+
