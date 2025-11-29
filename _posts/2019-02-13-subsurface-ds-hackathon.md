@@ -1,5 +1,5 @@
 ---
-title: 'Subsurface Data Science Hackathon'
+title: 'Write up of the UK’s first Subsurface Data Science Hackathon'
 date: 2019-02-13
 permalink: /posts/is-the-average-of-averages-the-same-as-the-overall-average
 tags:
@@ -7,7 +7,6 @@ tags:
   - machine learning
   - timeseries
 ---
-## Write up of the UK’s first Subsurface Data Science Hackathon
 Recently I attended the London OGA Data Science Hackathon, the first hackathon in the UK to focus on the use of machine learning with subsurface data. The event brought together oil and gas professionals from a range of companies and disciplines including; geoscientists, engineers, developers and data scientists.
 
 The weekend kicked off with a bootcamp on Friday looking at skills a digital geoscientist might need, data wrangling in Pandas, building web apps and APIs in Flask. Then it was dinner and then time to form teams for the hackathon, I joined team Mystic Bit along with some colleagues.
