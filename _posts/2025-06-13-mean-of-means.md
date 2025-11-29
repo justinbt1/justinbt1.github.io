@@ -13,7 +13,7 @@ The short answer to this question is no, the longer answer is it depends. The av
 - The cardinality (number of elements) of each averaged set are the same.
 - The trivial and rare case where all set averages equal to zero.
 
-Let's have a look at why, the mean of the values in the below set is $5.5$:
+Let's have a look at why, the mean of the values in the below set is $`5.5`$:
 
 $$
 a = \{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 \}
