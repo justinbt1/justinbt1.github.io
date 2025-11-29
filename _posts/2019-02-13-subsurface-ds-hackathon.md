@@ -16,6 +16,11 @@ Our teams goal was to use machine learning to predict in real time, the facies a
 
 Now we had our goal it was time to get to work, we decided to split into sub-teams each focusing on a particular task, predicting the gamma log ahead of the drill bit, facies prediction using predicted logs combined with local geology and a web-app. Each subteam took a pair programming approach with a geoscientist and data scientist both working closely together, all overseen by our great team leader who kept us all on track, thanks Dan!
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/justinbt1/Mystic-Bit/refs/heads/master/images/gamma_ray_prediction.jpg" />
+  <br>Gamma ray prediction (orange +) ahead of the drill bit.
+</p>
+
 ## Gamma Response Prediction
 Connor and Patrick tackled the task of predicting the gamma ray response ahead of the drill bit. Training Gradient Boosting Decision Tree Regressors on time lagged data already recorded during drilling. Uncertainty was captured using a quartile loss function, the range of which can be seen on the diagram to the left. This was a challenging task that involved extensive feature engineering to build the time lagged data set as well as the training of over 30 machine learning models.
 
