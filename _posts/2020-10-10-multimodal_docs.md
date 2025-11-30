@@ -499,6 +499,24 @@ To measure if the performance difference between similarly performing models is 
 ### Outcomes and Analysis
 The multi-modal models were benchmarked against the Dual Modality and Complete datasets and the average classification performance metrics obtained are below.
 
+For the dual modality dataset:
+
+| Model Architecture | Accuracy | Precision | Recall | F1 Score |
+| -- | -- | -- | -- | -- |
+| Text 1D-CNN | 86.3 | 0.86 | 0.86 | 0.86 |
+| Early Fusion C-LSTM | 82.5 | 0.84 | 0.83 | 0.83 |
+| Late Fusion C-LSTM | 84.2 | 0.85 | 0.85 | 0.85 |
+| Hybrid Fusion C-LSTM | 82.3 | 0.84 | 0.83 | 0.83 |. 
+
+For the complete dataset:
+
+| Model Architecture | Accuracy | Precision | Recall | F1 Score |
+| -- | -- | -- | -- | -- |
+| Multi-Page CNN (NN) | 72.5 | 0.75 | 0.73 | 0.73 |
+| Early Fusion C-LSTM | 77.3 | 0.8 | 0.78 | 0.78 |
+| Late Fusion C-LSTM | 81.1 | 0.82 | 0.81 | 0.81 |
+| Hybrid Fusion C-LSTM | 77.2 | 0.81 | 0.77 | 0.78 |
+
 For the Dual Modality Dataset the tuned uni-modal one dimensional CNN text classification model was the strongest performing classifier, this model significantly out performed the multi-modal classifiers when text data was available with an average accuracy 2.1% higher than the best performing multi-modal classifier. This suggests that the semantic and syntactic features extracted from a document’s text content are, when available, perhaps much stronger indicators of a documents classification than visual features such as page layout or image content. This is possibly also in part due to the high inter-class visual similarity of some document page images, such as title pages, all text pages or the identical all zero value padding images added to pad shorter page image sequences during pre-processing.
 
 Out of the multi-modal fusion strategies, the Late Fusion C-LSTM had the highest average accuracy of 84.2%, however this is only 1.7% greater than the average accuracy of the Early Fusion C-LSTM model and not statistically significant with a high p-value of 0.09. This means we must accept the null hypothesis and accept that any performance difference between the two models is likely due to random chance, possibly related to the stochastic nature of initializing and training deep neural networks. The Late Fusion C-LSTM also outperforms the Hybrid Fusion C-LSTM network by a small average accuracy percentage of 1.7%, however a p-value of 0.028 means the null hypothesis is rejected suggesting that the Hybrid Fusion C-LSTM may be marginally less performant.
