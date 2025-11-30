@@ -506,7 +506,7 @@ For the dual modality dataset:
 | Text 1D-CNN | 86.3 | 0.86 | 0.86 | 0.86 |
 | Early Fusion C-LSTM | 82.5 | 0.84 | 0.83 | 0.83 |
 | Late Fusion C-LSTM | 84.2 | 0.85 | 0.85 | 0.85 |
-| Hybrid Fusion C-LSTM | 82.3 | 0.84 | 0.83 | 0.83 |. 
+| Hybrid Fusion C-LSTM | 82.3 | 0.84 | 0.83 | 0.83 | 
 
 For the complete dataset:
 
