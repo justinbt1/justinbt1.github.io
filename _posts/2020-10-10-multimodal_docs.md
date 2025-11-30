@@ -195,6 +195,21 @@ Despite having a relatively simple architecture, originally proposed for the cla
 
 As a baseline the model was initially fitted and tested using the original architecture and hyperparameters as shown below. When trained with the original hyperparameters the model converged after an average of 23 epochs, the trained model had an average accuracy of 82.6%, average recall score of 0.83, average precision score of 0.83 and an average macro f1 score of 0.83 when evaluated against the test dataset.
 
+| Hyperparameter | Original Model | Tunned Model |
+|----------------|----------------|--------------|
+| Kernel Size | 4 | 7 |
+| Feature Maps | 100 | 200 |
+| Activation Function | ReLU | ReLU |
+| Pooling | Global 1-Max Pooling | Global 1-Max Pooling |
+| Dropout Rate | 0.5 | 0.3 |
+| l2 Regularisation | 3 | 0.5 |
+| Dense Hidden Layers | 0 | 1 |
+| Dense Layer Nodes | 0 | 50 |
+
+<p align="center">
+  <br>Hyperparameters of Original (Zhang, 2017) and Tunned Model.
+</p>
+
 The model was then optimised for the task of classifying documents in the NDR corpus through hyperparameter tuning. A coarse grid search was performed on each of the following hyperparameters to find it's optimal values relating to the models classification performance; the kernel size of each feature region and the number of feature maps in the convolutional layer, the dropout rate and the l2 norm constraint threshold.
 
 ```python
@@ -334,6 +349,18 @@ def image_cnn_lstm_model(
 ```
 
 The C-LSTM model performed significantly better than the Single Page CNN, showing an improvement of 6.5% average accuracy. How ever it performed worse than the Multi-Page CNN with the additional neural network ensemble layer, which had a 1.1% higher accuracy. However this is only a marginal gain with the simpler single model architecture and faster inference making the C-LSTM a more practical choice. The use of bi-directional LSTM layers in place of the uni-directional LSTM layers was also evaluated but did not improve the average performance of the model. An overview of average performance metrics for each page image classification model has been provided in Table 4.
+
+| Model Architecture | Average Accuracy | Average Precission | Average Recall | Average F1 | Average Epochs |
+|---|---|---|---|---|---|
+| Single Page CNN (First Page) | 67.1 | 0.69 | 0.68 | 0.68 | 4 |
+| Multi-Page CNN (Majority Vote) | 44.8 | 0.59 | 0.42 | 0.4 | 3 |
+| Multi-Page CNN (NN) | 72.4 | 0.75 | 0.73 | 0.73 | 3 + 7 |
+| Uni-Directional C-LSTM | 71.3 | 0.74 | 0.72 | 0.72 | 8 |
+| Bi-Directional C-LSTM | 70.3 | 0.73 | 0.71 | 0.71 | 8 |
+
+<p align="center">
+  <br>Uni-Modal Page Image Classifier Performance.
+</p>
 
 ## Multi-Modal Models
 ### Early Fusion Model
