@@ -54,6 +54,10 @@ Unfortunately features were not successfully extracted from all documents, some 
 | vsp_file | 673 | 621 | 673
 | **Total:** | 6541 | 5878 | 6541
 
+<p align="center">
+  <br>Count of Feature Sets Extracted per Document.
+</p>
+
 ### Text Pre-Processing
 The text feature dataset consists of a vector of integers T for each document representing the first 2,000 informative terms following text extraction and pre-processing. To create each vector, each document's text first had to be extracted. Text extraction from ascii format files was achieved using native Python. For Microsoft Office files and PDF files with an embedded searchable text layer text was extracted using Apache Tika Server. For scanned PDF files without an embedded text layer and image format files, text was extracted using the Tesseract OCR Engine.
 
