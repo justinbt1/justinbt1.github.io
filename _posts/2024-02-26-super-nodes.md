@@ -26,6 +26,11 @@ Super nodes can impact performance in a number of ways:
 ## Field of Research Example
 As an example our data model included Field of Research (FoR) nodes, which each represent a broad category of scientific research as defined by ANZSRC. There are 100 million Publication nodes in our database, each linked to one or more of the 176 Field of Research nodes.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/justinbt1/justinbt1.github.io/refs/heads/main/images/blog/snode.jpeg" />
+  <br>A Field of Research super node, with a sample of it's connected nodes displayed.
+</p>
+
 In a best case scenario, where the number of relationships is evenly distributed, each field of research would be linked to approximately 568,000 publications. However in reality publications from a small number of fields of research are over represented in our database, meaning millions of publications may have a relationship with a single field of research.
 
 For example the below Cypher query returns all researchers who have published clinical science papers in 2020:
@@ -72,6 +77,11 @@ For example a relationship between a publication and a field of research super n
 Refactoring super nodes to properties did improve the performance of our queries, particularly those that include, but do not filter on the new super node property. There was a wrinkle though, the incoming relationships on the super nodes were one to many relationships, meaning the new super node properties have multiple values.
 
 For example a publication node could be linked to multiple field of research nodes:
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/justinbt1/justinbt1.github.io/refs/heads/main/images/blog/snode.jpeg" />
+  <br>A Publication node linked to multiple Field of Research super nodes.
+</p>
 
 The properties of these field of research nodes now need to be set as properties on the publication node. Initially we used a list property to store these values, with a single list property for each of these values. This however is still not optimal as Neo4j does not currently support indexing on the elements within lists, making these slow to query at scale.
 
