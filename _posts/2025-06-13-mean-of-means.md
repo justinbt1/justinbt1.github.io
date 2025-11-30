@@ -48,15 +48,15 @@ The discrepancy is due to the combined average not accounting for the number of 
 We can apply the above process to our sets (a, b, c) to calculate the weighted averages, which when summed these give the true overall average of 5.5.
 
 $$
-2 (3 / 10) = 0.6
+\bar{a}\ (3 / 10) = 0.6
 $$  
 
 $$
-5 (3 / 10) = 1.5
+\bar{b}\ (3 / 10) = 1.5
 $$  
 
 $$
-8.5 (4 / 10) = 3.4
+\bar{c}\ (4 / 10) = 3.4
 $$  
 
 $$
