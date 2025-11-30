@@ -19,7 +19,7 @@ $$
 a = \{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 \}
 $$
 
-However, if we break this set into three arbitrary sets $(a, b, c)$ and take the mean of each we get a combined average across all sets of 5.17:
+However, if we break this set into three arbitrary sets (a, b, c) and take the mean of each we get a combined average across all sets of 5.17:
 
 $$
 a = \{1, 2, 3\}
