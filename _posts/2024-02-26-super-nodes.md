@@ -79,7 +79,7 @@ Refactoring super nodes to properties did improve the performance of our queries
 For example a publication node could be linked to multiple field of research nodes:
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/justinbt1/justinbt1.github.io/refs/heads/main/images/blog/snode.jpeg" />
+  <img src="https://raw.githubusercontent.com/justinbt1/justinbt1.github.io/refs/heads/main/images/blog/pub_node.jpg" />
   <br>A Publication node linked to multiple Field of Research super nodes.
 </p>
 
