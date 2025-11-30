@@ -44,6 +44,16 @@ As this is a new dataset, the text and page image features needed to be extracte
 
 Unfortunately features were not successfully extracted from all documents, some older Microsoft Office documents could not be processed, while others were corrupt or had non-standard file formats. Several documents also did not contain any text content and therefore lack a text feature set.
 
+|Document Class | Extracted Image Features | Extracted Text Features | Either Features|
+|---------------|--------------------------|-------------------------|----------------|
+| geol_geow | 1609 | 1477 | 1609
+| geol_sed | 1013 | 964 | 1013
+| gphys_gen | 1041 | 876 | 1041
+| log_sum | 1051 | 887 | 1051
+| pre_site | 1154 | 1053 | 1154
+| vsp_file | 673 | 621 | 673
+| **Total:** | 6541 | 5878 | 6541
+
 ### Text Pre-Processing
 The text feature dataset consists of a vector of integers T for each document representing the first 2,000 informative terms following text extraction and pre-processing. To create each vector, each document's text first had to be extracted. Text extraction from ascii format files was achieved using native Python. For Microsoft Office files and PDF files with an embedded searchable text layer text was extracted using Apache Tika Server. For scanned PDF files without an embedded text layer and image format files, text was extracted using the Tesseract OCR Engine.
 
