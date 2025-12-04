@@ -1,7 +1,7 @@
 ---
 title: 'Write up of the UK’s first Subsurface Data Science Hackathon'
 date: 2019-02-13
-permalink: /posts/subsurface-data-science-hackathon
+permalink: /post/subsurface-data-science-hackathon
 tags:
   - data science
   - machine learning

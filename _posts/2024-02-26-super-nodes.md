@@ -1,7 +1,7 @@
 ---
 title: 'Neo4j Super Node Performance Issues'
 date: 2024-02-26
-permalink: /posts/neo4j-super-node-performance-issues
+permalink: /post/neo4j-super-node-performance-issues
 tags:
   - databases
   - network analysis

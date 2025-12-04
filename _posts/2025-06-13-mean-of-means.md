@@ -1,7 +1,7 @@
 ---
 title: 'Is The Average of Averages The Same as The Overall Average?'
 date: 2025-06-13
-permalink: /posts/is-the-average-of-averages-the-same-as-the-overall-average
+permalink: /post/is-the-average-of-averages-the-same-as-the-overall-average
 tags:
   - data science
   - statistics

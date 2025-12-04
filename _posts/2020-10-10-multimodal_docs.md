@@ -1,7 +1,7 @@
 ---
 title: 'Multimodal Document Classification'
 date: 2020-10-10
-permalink: /posts/multimodal-document-classification
+permalink: /post/multimodal-document-classification
 tags:
   - natural language processing
   - image processing

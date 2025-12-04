@@ -1,7 +1,7 @@
 ---
 title: 'Creating Reproducible Data Science Projects'
 date: 2020-03-11
-permalink: /posts/creating-reproducible-data-science-projects
+permalink: /post/creating-reproducible-data-science-projects
 tags:
   - data science
   - mlops

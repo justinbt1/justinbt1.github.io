@@ -1,7 +1,7 @@
 ---
 title: 'Postgres Not Equal Only Returns Non-Null Values'
 date: 2025-06-06
-permalink: /posts/postgres-not-equal-only-returns-non-null-values
+permalink: /post/postgres-not-equal-only-returns-non-null-values
 tags:
   - databases
 ---
