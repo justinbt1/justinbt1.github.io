@@ -1,5 +1,5 @@
 ---
-title: 'Migrating Sub-Directory to New GitHub Repository While Preserving Their Git History'
+title: 'Migrating Sub-Directory While Preserving Git History'
 date: 2026-01-19
 permalink: /post/migrating-subfolder-while-preserving-git-history
 tags:
