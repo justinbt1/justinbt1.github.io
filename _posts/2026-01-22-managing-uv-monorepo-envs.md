@@ -55,11 +55,13 @@ members = [
 It is the default behaviour of running `uv init` in a sub-directory to add the newly created package to the shared uv workspace in the root `pyproject.toml` file.
 
 ## The Issue - Dependency Conflicts
-However, this approach does not scale well with increasing complexity, as sub-projects begin to have conflicting dependency requirements. Especially in our case where we have code from projects pushed to git over a period of multiple years and not necessarily maintained. This is what the uv docs have to say on the matter:
+However, the uv workspace approach does not scale well with increasing complexity, as sub-projects begin to have conflicting dependency requirements. Especially in our case where we may have code from analytics projects pushed to git over a period of multiple years and not necessarily maintained.
+
+This is what the uv docs have to say on how to manage complex repositories:
 
 > Workspaces are intended to facilitate the development of multiple interconnected packages within a single repository. As a codebase grows in complexity, it can be helpful to split it into smaller, composable packages, each with their own dependencies and version constraints.
 
-And:
+And when using a uv workspace may not be the best approach:
 
 > Workspaces are not suited for cases in which members have conflicting requirements, or desire a separate virtual environment for each member. In this case, path dependencies are often preferable.
 
