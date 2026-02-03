@@ -32,7 +32,7 @@ As a machine learning team we have a number of large projects that have their ow
   |_README.md
   |_pyproject.toml
 ```
-We use the extremely fast [uv](https://docs.astral.sh/uv/) package and project manager for our dependency management. Splitting more complex monorepos into multiple packages, each dedicated to a specific sub-project, while maintaining common shared dependencies. Sub-project directories are defined as members of a shared [uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/) as defined in the root level `pyproject.toml` file, along with the shared dependencies of the workspace.
+We use the extremely fast [uv](https://docs.astral.sh/uv/) package and project manager for our dependency management. Until recently we split more complex monorepos into multiple packages, each dedicated to a specific sub-project, while maintaining common shared dependencies. Sub-project directories are defined as members of a shared [uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/) as defined in the root level `pyproject.toml` file, along with the shared dependencies of the workspace.
 
 ```toml
 dependencies = [
