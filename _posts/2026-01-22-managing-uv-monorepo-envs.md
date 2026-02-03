@@ -71,7 +71,7 @@ If they exist remove the root level uv files, currently we are treating some of 
 ### 2. Manage Dependencies Using Multi-Root VSCode Workspaces
 By default, VSCode only scans the root directory of a project, meaning you have to manually add the interpreter path for each project sub-directory, open each project as an individual project or update the `$PATH` environment variable for VSCode to be able to use each projects `.venv`.
 
-This can be overcome using VSCode multi-root workspaces, these allow the editing of multiple isolated projects in the same editor window. This is added to the repo by defining each project in a `.code-workspace` file in the `.vscode` directory.
+This can be overcome using VSCode multi-root workspaces, these allow the editing of multiple isolated projects in the same editor window. This is added to the repo by defining each project in a `.code-workspace` file in the repositories root `.vscode` directory.
 
 Each sub-project is defined in a JSON format:
 
@@ -103,4 +103,4 @@ A `.vscode/settings.json` file is added to the root directory of each sub projec
 }
 ```
 
-This setup ensures that selecting files within a sub-project automatically loads the correct interpreter to execute the Python code.
+You can launch the multi-root workspace in VSCode by navigating to `File > Open workspace from file...` and selecting the `.code-workspace` file in the repositories root `.vscode` directory. This configuration ensures that when you access files within a sub-project, or launch an integrated terminal, the appropriate environment is automatically loaded.
