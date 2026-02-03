@@ -82,10 +82,6 @@ Each sub-project is defined in a JSON format:
 			"name": "Project 1",
 			"path": "../project_1"
 		},
-		{
-			"name": "Project 2",
-			"path": "../project_2",
-		},
         ...,
 		{
 			"name": "Project n",
@@ -103,4 +99,4 @@ A `.vscode/settings.json` file is added to the root directory of each sub projec
 }
 ```
 
-You can launch the multi-root workspace in VSCode by navigating to `File > Open workspace from file...` and selecting the `.code-workspace` file in the repositories root `.vscode` directory. This configuration ensures that when you access files within a sub-project, or launch an integrated terminal, the appropriate environment is automatically loaded.
+You can now launch the multi-root workspace in VSCode by navigating to `File > Open workspace from file...` and selecting the `.code-workspace` file in the repositories root `.vscode` directory. This configuration ensures that when you access files within a sub-project, or launch an integrated terminal, the appropriate environment is automatically loaded.
