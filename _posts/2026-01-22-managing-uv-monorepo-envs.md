@@ -52,10 +52,10 @@ members = [
   "project_n"
 ]
 ```
-It is the default behaviour of running `uv init` in a sub-directory to add the newly created package to the shared uv workspace in the root `pyproject.toml` file.
+The default behaviour of running `uv init` in a sub-directory, is to add a new `pyproject.toml` file to that directory and add the newly created package to the shared uv workspace in the root `pyproject.toml`.
 
 ## The Issue - Dependency Conflicts
-However, the uv workspace approach does not scale well with increasing complexity, as sub-projects begin to have conflicting dependency requirements. Especially in our case where we may have code from analytics projects pushed to git over a period of multiple years and not necessarily maintained.
+However, the uv workspace approach does not scale well with increasing complexity, as sub-projects begin to have conflicting dependency requirements. Especially in cases where code from analytics projects is pushed to git over a period of multiple years and not necessarily maintained.
 
 This is what the uv docs have to say on how to manage complex repositories:
 
@@ -67,10 +67,19 @@ And when using a uv workspace may not be the best approach:
 
 ## The Solution - Isolated Dependencies
 
-### 1. Remove Root Level uv From Repo
-If they exist remove the root level uv files and remove the , currently we are sharing the sub-projects dependencies as part of a shared workspace. Removing the root level uv files removes this 
+### 1. Remove the root level uv definitions from repository
+If they exist, remove any root level uv related files such as `uv.lock` and remove the root level `pyproject.toml` file. Each sub-project should still have their own directory, containing a 'pyproject.toml' file detailing that projects specific dependencies. The environment for a project can be created by navigating to that project directory using `cd` and running `uv sync`, this can be better managed using tools like VSCode's multi-root workspaces as detailed below.
 
-### 2. Manage Dependencies Using Multi-Root VSCode Workspaces
+It may also be useful to add the root level uv files to the repositories `.gitignore` file, to avoid any accidently created files being pushed to git. The uv specific additions to our `.gitignore` file, the `/` prefix ensures we only ignore root level files:
+
+```shell
+# monorepo management
+/.python-version
+/pyproject.toml
+/uv.lock
+```
+
+### 2. Manage dependencies using multi-root VSCode workspaces
 By default, VSCode only scans the root directory of a project, meaning you have to manually add the interpreter path for each project sub-directory, open each project as an individual project or update the `$PATH` environment variable for VSCode to be able to use each projects `.venv`.
 
 This can be overcome using VSCode multi-root workspaces, these allow the editing of multiple isolated projects in the same editor window. This is added to the repo by defining each project in a `.code-workspace` file in the repositories root `.vscode` directory.
