@@ -32,8 +32,7 @@ As a machine learning team we have a number of large projects that have their ow
   |_README.md
   |_pyproject.toml
 ```
-
-We use uv to manage our dependencies, however until recently we have not had a consistent approach to dependency management. For some projects we use isolated uv environments within each subfolder, but for the majority we use the default uv shared workspace, which allows shared dependencies between packages.
+We use the extremely fast [uv](https://docs.astral.sh/uv/) package and project manager for our dependency management. Splitting more complex monorepos into multiple packages, each dedicated to a specific sub-project, while maintaining common shared dependencies. Sub-project directories are defined as members of a shared [uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/) as defined in the root level `pyproject.toml` file, along with the shared dependencies of the workspace.
 
 ```toml
 dependencies = [
@@ -53,9 +52,10 @@ members = [
   "project_n"
 ]
 ```
+It is the default behaviour of running `uv init` in a sub-directory to add the newly created package to the shared uv workspace in the root `pyproject.toml` file.
 
 ## The Issue - Dependency Conflicts
-However, this approach does not scale well with increasing complexity, as sub-projects begin to have conflicting dependency requirements. Especially in our case where we have code from projects pushed over a period of multiple years and not necessarily maintained. This is what the uv docs have to say on the matter:
+However, this approach does not scale well with increasing complexity, as sub-projects begin to have conflicting dependency requirements. Especially in our case where we have code from projects pushed to git over a period of multiple years and not necessarily maintained. This is what the uv docs have to say on the matter:
 
 > Workspaces are intended to facilitate the development of multiple interconnected packages within a single repository. As a codebase grows in complexity, it can be helpful to split it into smaller, composable packages, each with their own dependencies and version constraints.
 
@@ -66,7 +66,7 @@ And:
 ## The Solution - Isolated Dependencies
 
 ### 1. Remove Root Level uv From Repo
-If they exist remove the root level uv files, currently we are treating some of the sub-projects as part of a shared workspace meaning they share dependencies. However we are not currently sharing any dependencies in the root `pyproject.toml` file.
+If they exist remove the root level uv files and remove the , currently we are sharing the sub-projects dependencies as part of a shared workspace. Removing the root level uv files removes this 
 
 ### 2. Manage Dependencies Using Multi-Root VSCode Workspaces
 By default, VSCode only scans the root directory of a project, meaning you have to manually add the interpreter path for each project sub-directory, open each project as an individual project or update the `$PATH` environment variable for VSCode to be able to use each projects `.venv`.
