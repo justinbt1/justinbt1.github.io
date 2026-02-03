@@ -1,5 +1,5 @@
 ---
-title: 'Optimising uv Dependency Management in Monorepos'
+title: 'Isolated uv Dependency Management in Monorepos'
 date: 2026-01-22
 permalink: /post/migrating-subfolder-while-preserving-git-history
 tags:
