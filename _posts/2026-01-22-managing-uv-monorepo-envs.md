@@ -80,9 +80,11 @@ It may also be useful to add the root level uv files to the repositories `.gitig
 ```
 
 ### 2. Manage dependencies using multi-root VSCode workspaces
-By default, VSCode only scans the root directory of a project, meaning you have to manually add the interpreter path for each project sub-directory, open each project as an individual project or update the `$PATH` environment variable for VSCode to be able to use each projects `.venv`.
+By default, VSCode only scans the root directory of a project, meaning you have to manually add the interpreter path for each project sub-directory, open each sub-project as an individual VSCode project in it's own window or update the `$PATH` environment variable for VSCode to be able to use each sub-projects isolated `.venv` environment.
 
-This can be overcome using VSCode multi-root workspaces, these allow the editing of multiple isolated projects in the same editor window. This is added to the repo by defining each project in a `.code-workspace` file in the repositories root `.vscode` directory.
+Multi-root workspaces can streamline working with these isolated environments in VSCode, allowing for multiple isolated projects to be loaded in the same editor window with improved interpreter management.
+
+This is added to the repo by defining each project in a `.code-workspace` file in the repositories root `.vscode` directory.
 
 Each sub-project is defined in a JSON format:
 
