@@ -63,14 +63,12 @@ And:
 
 > Workspaces are not suited for cases in which members have conflicting requirements, or desire a separate virtual environment for each member. In this case, path dependencies are often preferable.
 
-
-
 ## The Solution - Isolated Dependencies
 
-### Remove Root Level uv From Repo
-If they exist remove the root level uv files, currently we are treating some of the sub-projects as part of a shared workspace meaning they share dependencies. However we are not currently sharing any dependencies in the root pyproject.toml file.
+### 1. Remove Root Level uv From Repo
+If they exist remove the root level uv files, currently we are treating some of the sub-projects as part of a shared workspace meaning they share dependencies. However we are not currently sharing any dependencies in the root `pyproject.toml` file.
 
-### Manage Dependencies Using Multi-Root VSCode Workspaces
+### 2. Manage Dependencies Using Multi-Root VSCode Workspaces
 By default, VSCode only scans the root directory of a project, meaning you have to manually add the interpreter path for each project sub-directory, open each project as an individual project or update the `$PATH` environment variable for VSCode to be able to use each projects `.venv`.
 
 This can be overcome using VSCode multi-root workspaces, these allow the editing of multiple isolated projects in the same editor window. This is added to the repo by defining each project in a `.code-workspace` file in the `.vscode` directory.
@@ -81,22 +79,23 @@ Each sub-project is defined in a JSON format:
 {
 	"folders": [
 		{
-			"name": "Gold Standard Output Data",
-			"path": ".."
+			"name": "Project 1",
+			"path": "../project_1"
 		},
 		{
-			"name": "Software NER",
-			"path": "../software",
+			"name": "Project 2",
+			"path": "../project_2",
 		},
+        ...,
 		{
-			"name": "Software NER",
-			"path": "../software",
+			"name": "Project n",
+			"path": "../project_n",
 		}
 	]
 }
 ```
 
-A `.vscode/settings.json` file is added to the root directory of each sub project with the below configuration telling VSCode to use the sub-projects root .venv directory as it's default Python environment.
+A `.vscode/settings.json` file is added to the root directory of each sub project with the below configuration telling VSCode to use the sub-projects root `.venv` as it's default Python environment.
 
 ```json
 {
