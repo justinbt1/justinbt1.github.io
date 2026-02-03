@@ -1,7 +1,7 @@
 ---
 title: 'Isolated uv Dependency Management in Monorepos'
 date: 2026-01-22
-permalink: /post/migrating-subfolder-while-preserving-git-history
+permalink: /post/isolated_uv_dependency_management_in_monorepos
 tags:
   - what I learned today
   - mlops
