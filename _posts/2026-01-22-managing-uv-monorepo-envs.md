@@ -6,7 +6,7 @@ tags:
   - what I learned today
   - mlops
 ---
-As a machine learning team we have a number of large projects that have their own repositories, but this is not practical for the large number of smaller, more data science focused projects we carry out. These are stored in single large thematic monorepos, with each smaller project in sub-folders.
+As a machine learning team we have a number of large projects that have their own repositories, but this is not practical for the large number of smaller, more data science focused projects we carry out. These smaller projects are stored within large thematic monorepos, with each project contained within its own subfolder.
 
 ```
 |_monorepo/
