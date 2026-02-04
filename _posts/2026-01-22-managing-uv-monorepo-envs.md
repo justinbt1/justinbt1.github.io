@@ -84,9 +84,7 @@ By default, VSCode only scans the root directory of a project, meaning you have 
 
 Multi-root workspaces can streamline working with these isolated environments in VSCode, allowing for multiple isolated projects to be loaded in the same editor window with improved interpreter management.
 
-This is added to the repo by defining each project in a `.code-workspace` file in the repositories root `.vscode` directory.
-
-Each sub-project is defined in a JSON format:
+A multi-root workspace can be configured by adding each sub-project to a `.code-workspace` file in the repositories root `.vscode` directory. This is a JSON format file which defines sub-project directories to open as workspace members in a `"folders"` list. Each sub-project is represented by a dictionary containing the name of the sub-project and it's relative directory path. An example definition is below:
 
 ```json
 {
@@ -104,7 +102,7 @@ Each sub-project is defined in a JSON format:
 }
 ```
 
-A `.vscode/settings.json` file is added to the root directory of each sub project with the below configuration telling VSCode to use the sub-projects root `.venv` as it's default Python environment.
+To allow VSCode to automatically load the correct environment for each sub-project, a `.vscode/settings.json` file is added to the root directory of each sub-project. Each with the below parameters, which inform VSCode that the sub-projects root `.venv` environment should be loaded as that sub-projects default Python interpreter.
 
 ```json
 {
