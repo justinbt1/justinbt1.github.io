@@ -70,7 +70,7 @@ And when using a uv workspace may not be the best approach:
 ### 1. Remove the root level uv definitions from repository
 If they exist, remove any root level uv related files such as `uv.lock` and remove the root level `pyproject.toml` file. Each sub-project should still have their own directory, containing a 'pyproject.toml' file detailing that projects specific dependencies. The environment for a project can be created by navigating to that project directory using `cd` and running `uv sync`, this can be better managed using tools like VSCode's multi-root workspaces as detailed below.
 
-It may also be useful to add the root level uv files to the repositories `.gitignore` file, to avoid any accidently created files being pushed to git. The uv specific additions to our `.gitignore` file, the `/` prefix ensures we only ignore root level files:
+It may also be useful to add the root level uv files to the repositories `.gitignore` file, to avoid any accidently created files being pushed to git. The uv specific additions to our `.gitignore` file are below, the `/` prefix ensures we only ignore root level files:
 
 ```shell
 # monorepo management
@@ -84,7 +84,7 @@ By default, VSCode only scans the root directory of a project, meaning you have 
 
 Multi-root workspaces can streamline working with these isolated environments in VSCode, allowing for multiple isolated projects to be loaded in the same editor window with improved interpreter management.
 
-A multi-root workspace can be configured by adding each sub-project to a `.code-workspace` file in the repositories root `.vscode` directory. This is a JSON format file which defines sub-project directories to open as workspace members in a `"folders"` list. Each sub-project is represented by a dictionary containing the name of the sub-project and it's relative directory path. An example definition is below:
+A multi-root workspace can be configured by adding each sub-project to a `.code-workspace` file in the repositories root `.vscode` directory. This is a JSON format file which defines the sub-project directories to open as workspace members in a `"folders"` list. Each sub-project is represented by a dictionary containing the name of the sub-project and it's relative directory path. An example definition is below:
 
 ```json
 {
@@ -93,7 +93,7 @@ A multi-root workspace can be configured by adding each sub-project to a `.code-
 			"name": "Project 1",
 			"path": "../project_1"
 		},
-        ...,
+                ...,
 		{
 			"name": "Project n",
 			"path": "../project_n",
