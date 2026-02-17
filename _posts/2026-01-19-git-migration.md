@@ -12,7 +12,7 @@ Recently we decided to open source some code we use internally for bibliometrics
 It turns out this can be easily done using the `git-filter-repo` library, I've shared the steps below for anyone who needs to do the same.
 
 ### Prepare the Repositories
-First create a completley empty repo on GitHub and clone it locally, then make a fresh clone of the repo containing the sub-folder of code to be migrated.
+First create a completely empty repo on GitHub and clone it locally, then make a fresh clone of the repo containing the sub-folder of code to be migrated.
 
 ### Filter Repository Contents and Git History
 To use the `git-filter-repo` library with Python, first you will need to install it into an active Python environment using pip or pipx:
@@ -32,7 +32,7 @@ git remote -v
 ```
 Once satisfied that the origin is no longer pointing at the original repository you can update it to point to the new empty one:
 ```shell
-git remote set-url origin https://github.com/your_org/new_repo.git
+git remote add origin https://github.com/your_org/new_repo.git
 ```
 You can then push the code to the new repostory:
 ```shell
