@@ -37,15 +37,15 @@ $$
 (\bar{a} + \bar{b} + \bar{c}) / 3 = 5.17
 $$
 
-The discrepancy is due to the combined average not accounting for the number of elements in each set. This discrepancy will become larger as the difference between the set sizes increases.
+The discrepancy is due to the combined average not accounting for the number of elements in each set. This discrepancy will become larger as the difference between the set sizes increases.  
 
-The discrepancy is due to the combined average not accounting for the number of elements in each set. This discrepancy will become larger as the difference between the set sizes increases.
+We can instead use weighted averages to reliably calculate the overall average of all elements across all set. The weighted averages of sets (a, b, c) can be calculated using the below process:
 
 - For each set calculate a weight, this can be found by dividing the number of elements in a set by the total number of elements in all of the sets combined.
 - Weight the average of each set by finding the product between the sets average value and the associated weight.
 - Sum each of the weighted averages to give a combined average that represents the true average value of all elements in all sets.
 
-We can apply the above process to our sets (a, b, c) to calculate the weighted averages, which when summed these give the true overall average of 5.5.
+We can apply the above process to our sets (a, b, c) to calculate the weighted averages, which when summed give the true overall average of 5.5.
 
 $$
 \bar{a}\ (3 / 10) = 0.6
