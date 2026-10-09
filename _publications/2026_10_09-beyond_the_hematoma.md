@@ -1,3 +1,4 @@
+---
 title: "Beyond the Haematoma: Socioeconomic Deprivation and Outcomes in Chronic Subdural Hematoma in a Single-Centre Cohort Study"
 collection: publications
 category: manuscripts
