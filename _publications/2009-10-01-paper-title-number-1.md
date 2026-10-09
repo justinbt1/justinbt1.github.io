@@ -7,7 +7,7 @@ excerpt: 'A novel graph neural network that leverages both semantic and structur
 date: 2025-07-01
 venue: 'Proceedings of the Fifth Workshop on Scholarly Document Processing, Association for Computational Linguistics.'
 slidesurl: 
-paperurl: 'https://academicpages.github.io/files/paper1.pdf'
+paperurl: 'https://aclanthology.org/2025.sdp-1.4.pdf'
 bibtexurl: 
 citation: 'Muller E, Boylan-Toomey J, Ekinsmyth J, Robben A, Cardona MDLP, Langfelder A. 2025. GraphTranslate: Predicting Clinical Trial Translation using Graph Neural Networks on Biomedical Literature. In Proceedings of the Fifth Workshop on Scholarly Document Processing (SDP 2025), pages 31–41, Vienna, Austria. Association for Computational Linguistics (ACL).'
 ---
