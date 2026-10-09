@@ -3,7 +3,7 @@ title: "GraphTranslate: Predicting Clinical Trial Translation using Graph Neural
 collection: publications
 category: manuscripts
 permalink: /publication/2009-10-01-paper-title-number-1
-excerpt: 'A novel graph neural network that leverages both semantic and structural information to predict which research publications will lead to clinical trials. Our model analyses a comprehensive dataset of 19 million publication nodes, using transformer-based title and abstract sentence embeddings within their citation network context. Our graph-based architecture, which employs attention mechanisms over local citation neighbourhoods, outperforms traditional convolutional approaches by effectively capturing knowledge flow patterns. Our metadata is carefully selected to eliminate potential biases from researcher-specific information, while maintaining predictive power through network structural features.'
+excerpt: 'A novel graph neural network that leverages both semantic and structural information to predict which research publications will lead to clinical trials. Our model analyses a comprehensive dataset of 19 million publication nodes, using transformer-based title and abstract sentence embeddings within their citation network context.'
 date: 2025-07-01
 venue: 'Proceedings of the Fifth Workshop on Scholarly Document Processing, Association for Computational Linguistics.'
 slidesurl: 
