@@ -3,7 +3,7 @@ title: "Beyond the Haematoma: Socioeconomic Deprivation and Outcomes in Chronic 
 collection: publications
 category: publications
 permalink: /publication/2026_10_09-beyond_the_hematoma
-excerpt: 'Background Chronic subdural hematoma (CSDH) is common and increasing in incidence. Short-term post-surgical outcomes are good, but longer term, patients experience increased morbidity and early mortality than controls and the general population. Deprivation and ethnicity affect many health conditions, but to our knowledge, this is the first UK study investigating their association with CSDH outcomes.'
+excerpt: 'Chronic subdural hematoma (CSDH) is common and increasing in incidence. Short-term post-surgical outcomes are good, but longer term, patients experience increased morbidity and early mortality than controls and the general population. Deprivation and ethnicity affect many health conditions, but to our knowledge, this is the first UK study investigating their association with CSDH outcomes.'
 date: 2026-10-08
 venue: 'medRxiv.'
 slidesurl: 
