@@ -9,17 +9,17 @@ The round( ) function in Python is used to round a float to the specified precis
 
 The most commonly taught arithmetic approach to rounding .5 is to use the round-half-up method and round to the higher number. However Python instead uses bankers rounding, which rounds .5 to the nearest even number.
 
-### The Move to Bankers Rounding
+## The Move to Bankers Rounding
 Interestingly, Python 2 originally used the round-half-up rounding method, only adopting the bankers rounding approach during the shift to Python 3. This was change was introduced in PEP 3141 which stated “ float will change in 3.0 to round half toward even”. So what drove this shift in rounding methodology?
 
 While I do not know the exact reason for this decision, adopting bankers rounding brings Python 3 in line with other programming languages such as C, C#, Java and Go. It also means Python now complies with the IEEE 754 standard for how hardware and software handle floating point arithmetic.
 
-### Numerical Stability
+## Numerical Stability
 There is another very good reason to use bankers rounding for mathematical calculations at scale. As you always round .5 values up, using the round-half-up method at scale can cause a mathematical bias towards the higher number. This introduces a positive skew to the underlying distribution.
 
 For most mathematical and scientific calculations, bankers rounding is actually beneficial because it helps reduce this cumulative rounding bias. However, it can become problematic in situations where users expect traditional “round half up” behaviour or where fairness and transparency are more important than long-term statistical accuracy.
 
-### When is Bankers Rounding an Issue
+## When is Bankers Rounding an Issue
 Bankers rounding can be the cause of subtle bugs in software when there is an expectation gap between the developers and a languages default behaviour. It can also be an issue when dealing with legal, audit, or accounting requirements, which may specify or expect round-one-up rounding to be used.
 
 for an example of a rare case where Bankers rounding may be an issue, we can look at group assignment based on rounded scores. Imagine students are assigned to one of two groups based on the rounded result of an assessment score:
