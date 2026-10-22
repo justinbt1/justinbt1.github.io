@@ -5,7 +5,7 @@ permalink: /posts/python-rounding
 tags:
   - statistics
 ---
-The round( ) function in Python is used to round a float to the specified precision after the decimal point. For the most part this works as you may expect from high school math classes, rounding to the nearest higher or lower number. It’s when rounding two digits that are exactly between the higher or lower number, so for example rounding 2.5 to an integer, things get interesting.
+The `round( )` function in Python is used to round a float to the specified precision after the decimal point. For the most part this works as you may expect from high school math classes, rounding to the nearest higher or lower number. It’s when rounding two digits that are exactly between the higher or lower number, so for example rounding 2.5 to an integer, things get interesting.
 
 The most commonly taught arithmetic approach to rounding .5 is to use the round-half-up method and round to the higher number. However Python instead uses bankers rounding, which rounds .5 to the nearest even number.
 
