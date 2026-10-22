@@ -1,6 +1,6 @@
 ---
 title: 'Rounding in Python May Surprise You'
-date: 2025-06-13
+date: 2026-10-22
 permalink: /posts/python-rounding
 tags:
   - statistics
